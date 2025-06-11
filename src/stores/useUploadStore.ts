@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { Position } from '~/src/types/Position';
+import type { Position } from '~/types/Position';
 
 export const useUploadStore = defineStore('upload', () => {
     const position: Ref<Position | undefined> = ref<Position>();
@@ -15,5 +15,5 @@ export const useUploadStore = defineStore('upload', () => {
         }
     }
 
-    return {files, setFiles, setPosition};
+    return {files, position, setFiles, setPosition};
 });

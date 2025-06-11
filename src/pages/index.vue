@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { Store } from 'pinia';
 import type { Lang } from '~/types/Lang';
 import type { Position } from '~/types/Position';
 
@@ -39,22 +38,30 @@ async function translateClick(){
         formData.append("imgs", f[i]);
     }
 
-    let res: Position | void = await $fetch<Position>(config.public.api.base + "/translate/upload", {
-        method: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc0OTYzMTQ0OCwiaWF0IjoxNzQ5NjIwNjQ4fQ.ZgdPCN9a-le_CYiMjwRClXd1SCYmqwS5l_0e8osC5iQ'
-        },
-        body: formData
-    }).catch((err: string) => {
-        console.log(err);
+    try{
+        let res: Position[] | void = await $fetch<Position[]>(config.public.api.base + "/translate/upload", {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc0OTY0MzY4MSwiaWF0IjoxNzQ5NjMyODgxfQ.ZGgvgTla1kW0WomqRq2zNuJVOdZ4L-nRmSqQwADE2M0'
+            },
+            body: formData
+        });
+
+        if(res){
+            console.log("res", res[0]);
+            uploadStore.setPosition(res[0]);
+            uploadStore.setFiles(files.value);
+        
+            msgProcess.value = "";
+            router.push("/editor");
+        }else{
+            msgProcess.value = "Result not found";
+        }
+
+    }catch(err){
+        console.log("req failed", err);
         msgProcess.value = "Upload failed";
-    });
-
-    uploadStore.setPosition(res);
-    uploadStore.setFiles(files.value);
-
-    msgProcess.value = "";
-    router.push("/editor");
+    }
 }
 
 // onMounted(async () => {
