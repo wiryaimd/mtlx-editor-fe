@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { Store } from 'pinia';
-import { useUploadStore } from '~/stores/useUploadStore';
 import type { Lang } from '~/types/Lang';
 import type { Position } from '~/types/Position';
 
@@ -43,7 +42,7 @@ async function translateClick(){
     let res: Position | void = await $fetch<Position>(config.public.api.base + "/translate/upload", {
         method: 'POST',
         headers: {
-            'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc0OTYyMDUwNSwiaWF0IjoxNzQ5NjA5NzA1fQ.cwaSwMKvEhBcMBFmkC4bvy8mg88iEJohK5UQ6BJxSFY'
+            'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc0OTYzMTQ0OCwiaWF0IjoxNzQ5NjIwNjQ4fQ.ZgdPCN9a-le_CYiMjwRClXd1SCYmqwS5l_0e8osC5iQ'
         },
         body: formData
     }).catch((err: string) => {
