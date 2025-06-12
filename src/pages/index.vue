@@ -13,8 +13,10 @@ const uploadStore = useUploadStore();
 
 
 const targetLang: Lang[] = LANG;
+const sourceLang: Lang[] = LANG_SRC;
 // const targetLangId: string[] = LANG_TO_ID;
 
+const selectedLangSource: Ref<string> = ref("none");
 const selectedLang: Ref<string> = ref("none");
 
 function selectedFile(e: Event){
@@ -31,7 +33,8 @@ async function translateClick(){
 
     let f: File[] = files.value;
     let formData: FormData = new FormData();
-    formData.append("lang", selectedLang.value);
+    formData.append("langSrc", selectedLangSource.value);
+    formData.append("langTo", selectedLang.value);
 
     for(let i: number = 0; i < f.length; i++){
         console.log(f[i].name + " " + f[i].size);
@@ -42,7 +45,7 @@ async function translateClick(){
         let res: Position[] | void = await $fetch<Position[]>(config.public.api.base + "/translate/upload", {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc0OTY0MzY4MSwiaWF0IjoxNzQ5NjMyODgxfQ.ZGgvgTla1kW0WomqRq2zNuJVOdZ4L-nRmSqQwADE2M0'
+                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc0OTczODkyMywiaWF0IjoxNzQ5NzI4MTIzfQ.z90XIeVkJJ_s6pnPJc237_eS0z2AgrWRyZFbtHOV228'
             },
             body: formData
         });
@@ -74,36 +77,49 @@ async function translateClick(){
 
 <template>
     <div>
-        <h3>Home</h3>
-        <p>{{selectedLang}}</p>
+        <Header></Header>
     </div>
 
-    <div class="main">
-        <div>
-            <!-- style="display: none;" -->
-            <input id="select" type="file" accept="image/jpg|image/jpg" multiple @change="selectedFile">
-            <!-- <label for="select">Select</label> -->
-        </div>
+    <div>
+        <h3>Home</h3>
+        <p>{{selectedLangSource}} {{selectedLang}}</p>
+    </div>
 
-        <div class="row">
-            <div>
-                <select v-model="selectedLang">
+    <div class="flex flex-col items-center">
+        <label class="p-3 bg-blue-100 rounded-sm border-2 border-dotted w-100 text-center" for="select">
+            <!-- style="display: none;" -->
+            <input class="sr-only" id="select" type="file" accept="image/jpg|image/jpg" multiple @change="selectedFile">
+            <!-- <label class="bg-blue-200 rounded-sm border-2 border-dotted" for="select">Select</label> -->
+             Select
+        </label>
+
+        <div class="flex w-100">
+            <div class="w-full bg-red-300 mb-5 mt-5 p-1 rounded">
+                <select class="w-full" v-model="selectedLangSource">
+                    <option value="none" selected>&lt;Letter type&gt;</option>
+                    <option v-for="t in sourceLang" :value="t.id" :key="t.id">{{ t.lang }}</option>
+                </select>
+            </div>
+
+            <div class="ml-5 w-full bg-red-300 mb-5 mt-5 p-1 rounded">
+                <select class="w-full" v-model="selectedLang">
                     <option value="none" selected>&lt;Target&gt;</option>
                     <option v-for="t in targetLang" :value="t.id" :key="t.id">{{ t.lang }}</option>
                 </select>
             </div>
-            <div>
+            <div class="mt-5 ml-5 mb-5 bg-red-300 rounded p-1">
                 <button @click="translateClick">Translate</button>
             </div>
         </div>
+        
 
-        <div class="file_list">
-            <ul>
+        <div class="flex w-100">
+            <ul class="w-full">
                 <!-- <li v-for="index in Math.max(15, files.length)">
                     {{ files[index].name }}
                 </li> -->
 
-                <li v-for="f in showFile"> {{f}} </li>
+                <li class="w-full text-center" v-for="f in showFile"> {{f}} </li>
 
                 <p v-if="files.length > 15">.... {{files.length}} files</p>
             </ul>

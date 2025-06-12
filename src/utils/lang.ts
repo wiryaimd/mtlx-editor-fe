@@ -5,6 +5,25 @@ export const LANG_TO: string[] = ["Afrikaans", "Albanian", "Amharic", "Arabic", 
 export const LANG_TO_ID: string[] = ["af", "sq", "am", "ar", "hy", "as", "ay", "az", "bm", "eu", "be", "bn", "bho", "bs", "bg", "ca", "ceb", "zh", "zh-TW", "co", "hr", "cs", "da", "dv", "doi", "nl", "en", "eo", "et", "ee", "fil", "fi", "fr", "fy", "gl", "ka", "de", "el", "gn", "gu", "ht", "ha", "haw", "he", "hi", "hmn", "hu", "is", "ig", "ilo", "id", "ga", "it", "ja", "jv", "kn", "kk", "km", "rw", "gom", "ko", "kri", "ku", "ckb", "ky", "lo", "la", "lv", "ln", "lt", "lg", "lb", "mk", "mai", "mg", "ms", "ml", "mt", "mi", "mr", "mni-Mtei", "lus", "mn", "my", "ne", "no", "ny", "or", "om", "ps", "fa", "pl", "pt", "pa", "qu", "ro", "ru", "sm", "sa", "gd", "nso", "sr", "st", "sn", "sd", "si", "sk", "sl", "so", "es", "su", "sw", "sv", "tl", "tg", "ta", "tt", "te", "th", "ti", "ts", "tr", "tk", "ak", "uk", "ur", "ug", "uz", "vi", "cy", "xh", "yi", "yo", "zu"]
 
 export const LANG: Lang[] = [];
+export const LANG_SRC: Lang[] = [
+    {
+        "id": "default",
+        "lang": "Latin (Default)"
+    },
+    {
+        "id": "ja",
+        "lang": "Japanese"
+    },
+    {
+        "id": "zh",
+        "lang": "Chinese",
+    },
+    {
+        "id": "ko",
+        "lang": "Korean"
+    }
+];
+
 for(let i = 0; i < LANG_TO.length; i++){
     LANG.push({
         "id": LANG_TO_ID[i],

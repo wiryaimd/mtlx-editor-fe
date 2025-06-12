@@ -1,11 +1,11 @@
-interface Box{
+export interface Box{
     left: number,
     right: number,
     top: number,
-    bot: number,
+    bot: number
 }
 
-interface Detail{
+export interface Detail{
     text: string,
     confidence: number,
     wordSize: number,
