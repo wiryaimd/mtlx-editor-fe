@@ -45,7 +45,7 @@ async function translateClick(){
         let res: Position[] | void = await $fetch<Position[]>(config.public.api.base + "/translate/upload", {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc0OTczODkyMywiaWF0IjoxNzQ5NzI4MTIzfQ.z90XIeVkJJ_s6pnPJc237_eS0z2AgrWRyZFbtHOV228'
+                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc0OTgyMzAxNCwiaWF0IjoxNzQ5ODEyMjE0fQ._T47lZ1WPqoekiFRXrOvTAX5o68eagqNB37pupt3gTE'
             },
             body: formData
         });

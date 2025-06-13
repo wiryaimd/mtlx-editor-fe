@@ -9,7 +9,8 @@ export interface Detail{
     text: string,
     confidence: number,
     wordSize: number,
-    box: Box
+    box: Box,
+    boxText: Box
 }
 
 export interface Position{

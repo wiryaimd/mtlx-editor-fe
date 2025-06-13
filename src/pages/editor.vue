@@ -1,10 +1,23 @@
 <script setup lang="ts">
+import type { BoxPosition } from '~/types/BoxPosition';
 import type { Position, Detail, Box } from '~/types/Position';
+import type { SelectedBox } from '~/types/SelectedBox';
 
 const uploadStore = useUploadStore();
 
 const imgRaw = ref("");
 const imgTl = ref("");
+
+const showBoxPosition = ref<Box>({
+    left: 0,
+    top: 0,
+    right: 0,
+    bot: 0
+});
+
+const previewStatus = ref<boolean>(true);
+const indexBox = ref<number>();
+const indexText = ref<number>();
 
 const oriWidth = uploadStore.position?.width;
 const oriHeight = uploadStore.position?.height;
@@ -52,7 +65,16 @@ function onLoad(){
                         bot: d.box.bot * scaleY
                     }
 
+                    const boxText: Box = {
+                        left: d.boxText.left * scaleX,
+                        right: d.boxText.right * scaleX,
+                        top: d.boxText.top * scaleY,
+                        bot: d.boxText.bot * scaleY
+                    }
+                    
+                    d.boxText = boxText;
                     d.box = box;
+                    d.wordSize = d.wordSize * scaleY;
                     return d;
                 });
 
@@ -60,6 +82,23 @@ function onLoad(){
             }
         }
     }
+}
+
+function onBoxMove(boxPosition: BoxPosition){
+    showBoxPosition.value = {
+        left: boxPosition.x,
+        top: boxPosition.y,
+        right: boxPosition.x + boxPosition.width,
+        bot: boxPosition.y + boxPosition.height
+    }
+}
+
+function onBoxClick(index: number){
+    indexBox.value = index;
+}
+
+function onTextClick(index: number){
+    indexText.value = index;
 }
 
 onMounted(() => {
@@ -80,24 +119,69 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="flex flex-col h-screen bg-green-50">
+    <div class="flex flex-col bg-green-50 h-screen">
         <div>
             <Header></Header>
         </div>
 
         <div>
-            <h3>Editor</h3>
+            <input type="checkbox" checked="true" v-model="previewStatus">Border {{ previewStatus }}</input>
         </div>
-
-        <!-- <div class="img">
-            <img ref="rawRef" :src="imgRaw" alt="raw" width="350px" height="500px">
-        </div> -->
-    
-        <div class="relative overflow-hidden m-15 inline-block">
-            <img class="h-full" @load="onLoad" ref="tlRef" :src="imgTl" alt="tl" height="100vh">
-            <div v-if="detailPositionList">
-                <Box v-for="(box, index) in detailPositionList" :key="index" v-model:detail_position="detailPositionList[index]"></Box>
+        
+        <div class="flex flex-1 overflow-hidden">
+            <div class="relative overflow-hidden ml-6 mr-6 mt-15 mb-15 inline-block">
+                <img class="h-full" ref="tlRaw" :src="imgTl" alt="raw" height="100vh" draggable="false">
             </div>
+
+            <div class="relative overflow-hidden mt-15 mb-15 inline-block">
+                <img class="h-full" @load="onLoad" ref="tlRef" :src="imgTl" alt="tl" height="100vh" draggable="false">
+                <div v-if="detailPositionList">
+                    <Box 
+                        @box-move="onBoxMove"
+                        @box-click="onBoxClick"
+                        v-for="(box, index) in detailPositionList" 
+                        :key="index"
+                        :index="index"
+                        v-model:preview_status="previewStatus"
+                        v-model:detail_position="detailPositionList[index]">
+                    </Box>
+                </div>
+
+                <div v-if="detailPositionList">
+                    <Dialog 
+                        @text-click="onTextClick"
+                        v-for="(dg, index) in detailPositionList" 
+                        :index="index"
+                        :key="index" 
+                        v-model:preview_status="previewStatus"
+                        v-model:detail_text="detailPositionList[index]">
+                    </Dialog>
+                </div>
+            </div>
+
+            <div>
+                <div v-if="indexBox">
+                    <p>Index {{ indexBox }}</p>
+                </div>
+    
+                <div v-if="indexText">
+                    <p>Index text {{ indexText }}</p>
+                </div>
+            </div>
+
+            <div v-if="showBoxPosition" class="m-15">
+                <p>{{ showBoxPosition.left.toFixed() }}</p>
+                <p>{{ showBoxPosition.top.toFixed() }}</p>
+            </div>
+
+            <div v-if="detailPositionList && indexText">
+                <textarea class="bg-blue-100 p-2 w-full border rounded" v-model="detailPositionList[indexText].text" rows="10" cols="50"></textarea>
+            </div>
+
+            <div v-else>
+                <textarea class="bg-blue-100 p-2 w-full border rounded" rows="10" cols="50"></textarea>
+            </div>
+
         </div>
 
     </div>

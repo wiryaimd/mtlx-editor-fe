@@ -11,6 +11,6 @@ export default defineNuxtConfig({
       }
     }
   },
-
+  css: ['@/assets/css/fonts.css'],
   modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss"]
 })
