@@ -3,6 +3,7 @@ import { BaseTransitionPropsValidators } from 'vue';
 import type { BoxPosition } from '~/types/BoxPosition';
 import type { Position, Detail, Box } from '~/types/Position';
 import type { Scale } from '~/types/Scale';
+import type { SelectedBox } from '~/types/SelectedBox';
 
 const uploadStore = useUploadStore();
 
@@ -31,8 +32,6 @@ if(uploadStore.files){
     for(let i = 0; i < uploadStore.files.length; i++){
         imgList.push(URL.createObjectURL(uploadStore.files[i]));
     }
-
-    // imgTl.value = imgList[0];
 }
 
 watch(indexPage, (val: number) => {
@@ -42,12 +41,9 @@ watch(indexPage, (val: number) => {
         // currentPosition.value = positionList.value[val];
         imgTl.value = imgList[val];
         indexText.value = -1;
+        indexBox.value = -1;
     }
 }, {immediate: true});
-
-// watch(currentPosition, (pos: Ref<Position | undefined>) => {
-
-// })
 
 function onLoad(){
     console.log("ckekkk")
@@ -65,88 +61,44 @@ function onLoad(){
                 scaleX: scaleX,
                 scaleY: scaleY
             };
-
-            // currentPosition.value = {...position};
-            // console.log("call???", indexPage.value);
         }
-            
-            // let detailList: Detail[] = originalPosition.details.map((d) => {                
-            //     return {
-            //         ...d,
-            //         box: {
-            //             left: d.box.left * scaleX,
-            //             right: d.box.right * scaleX,
-            //             top: d.box.top * scaleY,
-            //             bot: d.box.bot * scaleY
-            //         }, 
-            //         boxText: {
-            //             left: d.boxText.left * scaleX,
-            //             right: d.boxText.right * scaleX,
-            //             top: d.boxText.top * scaleY,
-            //             bot: d.boxText.bot * scaleY
-            //         },
-            //         wordSize: d.wordSize * scaleY
-            //     };
-            // });
-            
-            // currentPosition.value = {
-            //     ...originalPosition,
-            //     details: detailList
-            // };
-
-            // let position: Position[] = uploadStore.position;
-            // let list: Position[] = positionList.value;
-            // for(let i = 0; i < positionList.value.length; i++){
-                
-
-                // let position: Position = list[i];
-                // positionList.value[i].details = detailList;
-                // position.details = detailList;
-                // list[i] = position;
-            // }
-
-            // positionList.value = list;
-            // scaledPositionList.value = positionList.value;
-            // currentPosition.value = positionList.value[0];
-
-            // loadOnce.value = true;
-
-            // console.log("sx", scaleX);
-            // console.log("sy", scaleY);
-
-            // if(position){
-                // const boxList: BoxPosition[] = [];
-                // for(let i = 0; i < position.details.length; i++){
-                //     console.log("pos: ", position.details[i].box.left);
-                //     console.log("pos: ", position.details[i].box.top);
-                //     let left: number = position.details[i].box.left;
-                //     let top: number = position.details[i].box.top;
-                    
-                //     // boxList.push({
-                //     //     x: left * scaleX,
-                //     //     y: top * scaleY
-                //     // });
-                // }
-            // }
     }
 }
 
-function onBoxMove(boxPosition: BoxPosition){
-    showBoxPosition.value = { // need to calcualte back to default scale
-        left: boxPosition.x,
-        top: boxPosition.y,
-        right: boxPosition.x + boxPosition.width,
-        bot: boxPosition.y + boxPosition.height
+function onBoxMove(box: SelectedBox){
+    if(!scale.value) return
+
+    // nb, need to calcualte back to default scale
+    showBoxPosition.value = {
+        left: box.boxPosition.x / scale.value.scaleX,
+        right: (box.boxPosition.x + box.boxPosition.width) / scale.value.scaleX,
+        top: box.boxPosition.y / scale.value.scaleY,
+        bot: (box.boxPosition.y + box.boxPosition.height) / scale.value.scaleY
     }
+
+    if(!positionList.value) return;
+    positionList.value[indexPage.value].details[box.index].box = showBoxPosition.value;
 }
 
 function onBoxClick(index: number){
     indexBox.value = index;
 }
 
+function onTextMove(box: SelectedBox){
+    if(!positionList.value || !scale.value) return;
+
+    positionList.value[indexPage.value].details[box.index].boxText = { // scaled back
+        left: box.boxPosition.x / scale.value.scaleX,
+        right: (box.boxPosition.x + box.boxPosition.width) / scale.value.scaleX,
+        top: box.boxPosition.y / scale.value.scaleY,
+        bot: (box.boxPosition.y + box.boxPosition.height) / scale.value.scaleY
+    };
+}
+
 function onTextClick(index: number){
     indexText.value = index;
 }
+
 
 onMounted(() => {
 
@@ -165,7 +117,6 @@ onMounted(() => {
             <div class="relative overflow-hidden mt-15 mb-15 inline-block">
                 <img class="border h-full" @load="onLoad" ref="tlRef" :src="imgTl" alt="tl" height="100vh" draggable="false">
                 <div v-if="positionList && scale">
-                    {{ console.log("oi first") }}
                     <Box 
                         @box-move="onBoxMove"
                         @box-click="onBoxClick"
@@ -180,6 +131,7 @@ onMounted(() => {
 
                 <div v-if="positionList && scale">
                     <Dialog 
+                        @text-move="onTextMove"
                         @text-click="onTextClick"
                         v-for="(dg, index) in positionList[indexPage].details" 
                         :index="index"

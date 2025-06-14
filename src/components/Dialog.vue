@@ -19,6 +19,8 @@ const textIndex = props.index;
 const emit = defineEmits(['textMove', 'textClick'])
 
 let start = { x: 0, y: 0 };
+let width = 0;
+let height = 0;
 
 watch([detailPosition, scalePosition], ([dp, sc]) => {
     if(!dp || !sc) return;
@@ -33,11 +35,14 @@ watch([detailPosition, scalePosition], ([dp, sc]) => {
     let top = boxText.top * sc.scaleY;
     let bot = boxText.bot * sc.scaleY;
 
+    width = right - left;
+    height = bot - top;
+
     boxPosition.value = {
         x: left,
         y: top,
-        width: right - left,
-        height: bot - top
+        width: width,
+        height: height
     };
 
     wordSize.value = dp.wordSize * sc.scaleY;
@@ -74,14 +79,17 @@ function onDrag(e: MouseEvent) {
     boxPosition.value = {
         x: newLeft,
         y: newTop,
-        width: -1,
-        height: -1
+        width: width,
+        height: height
     };
-
-    emit('textMove', boxPosition.value);
 }
 
 function stopDrag() {
+    emit('textMove', {
+        index: textIndex,
+        boxPosition: boxPosition.value
+    });
+
     isDrag.value = false
     window.removeEventListener('mousemove', onDrag)
     window.removeEventListener('mouseup', stopDrag)

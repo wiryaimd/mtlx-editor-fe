@@ -18,14 +18,15 @@ const isDrag: Ref<boolean> = ref<boolean>(false);
 
 const emit = defineEmits(['boxMove', 'boxClick'])
 
-let cleanWidth = 0;
+// let cleanWidth = 0;
 
 let boxIndex: number = props.index;
 let start = { x: 0, y: 0 };
 
+// bug, width and height increasing when page move, this ahappen when emit to parent, and reapply the position
 let boxWidth = 0, boxHeight = 0;
 
-watch([detailPosition, scalePosition], ([dp, sc]) => {
+watch([detailPosition, scalePosition], ([dp, sc]) => { // this called twice, because emit()?
     if(!dp || !sc) return;
 
     const box: Box = dp.box;
@@ -35,7 +36,9 @@ watch([detailPosition, scalePosition], ([dp, sc]) => {
     let top = box.top * sc.scaleY;
     let bot = box.bot * sc.scaleY;
     
-    cleanWidth = Math.floor((right - left) * 0.12); // default 0.08
+    console.log(boxIndex, " lr ", left, right);
+    let cleanWidth = Math.floor((right - left) * 0.12); // default 0.08
+
     boxWidth = (right - left + (cleanWidth * 2));
     boxHeight = (bot - top + (cleanWidth * 2));
 
@@ -68,7 +71,6 @@ function startDrag(e: MouseEvent){
 
     window.addEventListener('mousemove', onDrag)
     window.addEventListener('mouseup', stopDrag)
-
 }
 
 function onDrag(e: MouseEvent) {
@@ -78,16 +80,21 @@ function onDrag(e: MouseEvent) {
     let newTop = e.clientY - start.y;
 
     boxPosition.value = {
-        x: newLeft - cleanWidth,
-        y: newTop - cleanWidth,
+        // x: newLeft - cleanWidth,
+        // y: newTop - cleanWidth,
+        x: newLeft, // try
+        y: newTop,
         width: boxWidth,
         height: boxHeight
     };
-
-    emit('boxMove', boxPosition.value);
 }
 
 function stopDrag() {
+    emit('boxMove', { // keep positionList in original raw position, for final export
+        index: boxIndex,
+        boxPosition: boxPosition.value
+    });
+
     isDrag.value = false
     window.removeEventListener('mousemove', onDrag)
     window.removeEventListener('mouseup', stopDrag)
