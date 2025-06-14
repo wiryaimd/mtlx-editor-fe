@@ -45,14 +45,14 @@ async function translateClick(){
         let res: Position[] | void = await $fetch<Position[]>(config.public.api.base + "/translate/upload", {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc0OTgyMzAxNCwiaWF0IjoxNzQ5ODEyMjE0fQ._T47lZ1WPqoekiFRXrOvTAX5o68eagqNB37pupt3gTE'
+                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc0OTkxMDkyOCwiaWF0IjoxNzQ5OTAwMTI4fQ._o-yiS-am9P3paCAp6MN2QWDRam4IIsmQehagkSYpGY'
             },
             body: formData
         });
 
         if(res){
-            console.log("res", res[0]);
-            uploadStore.setPosition(res[0]);
+            console.log("res", res);
+            uploadStore.setPosition(res);
             uploadStore.setFiles(files.value);
         
             msgProcess.value = "";
@@ -81,33 +81,32 @@ async function translateClick(){
     </div>
 
     <div>
-        <h3>Home</h3>
         <p>{{selectedLangSource}} {{selectedLang}}</p>
     </div>
 
-    <div class="flex flex-col items-center">
-        <label class="p-3 bg-blue-100 rounded-sm border-2 border-dotted w-100 text-center" for="select">
+    <div class="flex flex-col items-center mt-16">
+        <label class="p-3 rounded-sm border-2 border-dotted w-150 text-center" for="select">
             <!-- style="display: none;" -->
             <input class="sr-only" id="select" type="file" accept="image/jpg|image/jpg" multiple @change="selectedFile">
             <!-- <label class="bg-blue-200 rounded-sm border-2 border-dotted" for="select">Select</label> -->
              Select
         </label>
 
-        <div class="flex w-100">
-            <div class="w-full bg-red-300 mb-5 mt-5 p-1 rounded">
+        <div class="flex w-150">
+            <div class="w-full border mb-5 mt-5 p-1 rounded">
                 <select class="w-full" v-model="selectedLangSource">
                     <option value="none" selected>&lt;Letter type&gt;</option>
                     <option v-for="t in sourceLang" :value="t.id" :key="t.id">{{ t.lang }}</option>
                 </select>
             </div>
 
-            <div class="ml-5 w-full bg-red-300 mb-5 mt-5 p-1 rounded">
+            <div class="ml-5 border w-full mb-5 mt-5 p-1 rounded">
                 <select class="w-full" v-model="selectedLang">
                     <option value="none" selected>&lt;Target&gt;</option>
                     <option v-for="t in targetLang" :value="t.id" :key="t.id">{{ t.lang }}</option>
                 </select>
             </div>
-            <div class="mt-5 ml-5 mb-5 bg-red-300 rounded p-1">
+            <div class="mt-5 ml-5 mb-5 border bg-red-50 px-5 rounded p-1">
                 <button @click="translateClick">Translate</button>
             </div>
         </div>

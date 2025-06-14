@@ -2,6 +2,7 @@
 import Index from '~/pages/index.vue';
 import type { BoxPosition } from '~/types/BoxPosition';
 import type { Box, Detail } from '~/types/Position';
+import type { Scale } from '~/types/Scale';
 import type { SelectedBox } from '~/types/SelectedBox';
 
 const props = defineProps<{
@@ -9,6 +10,7 @@ const props = defineProps<{
 }>();
 
 const detailPosition: Ref<Detail | undefined> = defineModel<Detail>('detail_position');
+const scalePosition: Ref<Scale | undefined> = defineModel<Scale>('scale_position');
 const previewStatus: Ref<boolean | undefined> = defineModel<boolean>('preview_status');
 const boxPosition: Ref<BoxPosition | undefined> = ref<BoxPosition>();
 
@@ -23,25 +25,32 @@ let start = { x: 0, y: 0 };
 
 let boxWidth = 0, boxHeight = 0;
 
-if(detailPosition.value){
-    const box: Box = detailPosition.value.box;
-    cleanWidth = Math.floor((box.right - box.left) * 0.12); // default 0.08
+watch([detailPosition, scalePosition], ([dp, sc]) => {
+    if(!dp || !sc) return;
 
-    boxWidth = (box.right - box.left + (cleanWidth * 2));
-    boxHeight = (box.bot - box.top + (cleanWidth * 2));
+    const box: Box = dp.box;
+    
+    let left = box.left * sc.scaleX;
+    let right = box.right * sc.scaleX;
+    let top = box.top * sc.scaleY;
+    let bot = box.bot * sc.scaleY;
+    
+    cleanWidth = Math.floor((right - left) * 0.12); // default 0.08
+    boxWidth = (right - left + (cleanWidth * 2));
+    boxHeight = (bot - top + (cleanWidth * 2));
 
     boxPosition.value = {
-        x: (box.left - cleanWidth),
-        y: (box.top - cleanWidth),
+        x: (left - cleanWidth),
+        y: (top - cleanWidth),
         width: boxWidth,
         height: boxHeight
     };
 
     start = {
-        x: (box.left - cleanWidth),
-        y: (box.top - cleanWidth)
+        x: (left - cleanWidth),
+        y: (top - cleanWidth)
     }
-}
+}, { immediate: true }); // immediate, make the code executed when first initialize
 
 // watch(previewStatus, (val) => {
 //     console.log(val);

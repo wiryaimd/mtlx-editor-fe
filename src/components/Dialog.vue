@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import type { BoxPosition } from '~/types/BoxPosition';
 import type { Box, Detail } from '~/types/Position';
+import type { Scale } from '~/types/Scale';
 
 const props = defineProps<{
     index: number
 }>();
 
 const detailPosition: Ref<Detail | undefined> = defineModel<Detail>('detail_text');
+const scalePosition: Ref<Scale | undefined> = defineModel<Scale>('scale_position');
 const previewStatus: Ref<boolean | undefined> = defineModel<boolean>('preview_status');
 const boxPosition: Ref<BoxPosition | undefined> = ref<BoxPosition>();
+const wordSize: Ref<number> = ref<number>(0);
 
 const isDrag: Ref<boolean> = ref<boolean>(false);
 const textIndex = props.index;
@@ -17,18 +20,27 @@ const emit = defineEmits(['textMove', 'textClick'])
 
 let start = { x: 0, y: 0 };
 
-if(detailPosition.value){
-    const boxText: Box = detailPosition.value.boxText;
-    const box: Box = detailPosition.value.box;
-    console.log("text draw " + detailPosition.value.text);
-    console.log("fnt size scale ", detailPosition.value.wordSize);
+watch([detailPosition, scalePosition], ([dp, sc]) => {
+    if(!dp || !sc) return;
+
+    const boxText: Box = dp.boxText;
+    const box: Box = dp.box;
+    console.log("text draw " + dp.text);
+    console.log("fnt size scale ", dp.wordSize);
+
+    let left = boxText.left * sc.scaleX;
+    let right = boxText.right * sc.scaleX;
+    let top = boxText.top * sc.scaleY;
+    let bot = boxText.bot * sc.scaleY;
 
     boxPosition.value = {
-        x: boxText.left,
-        y: boxText.top,
-        width: boxText.right - boxText.left,
-        height: boxText.bot - boxText.top
+        x: left,
+        y: top,
+        width: right - left,
+        height: bot - top
     };
+
+    wordSize.value = dp.wordSize * sc.scaleY;
 
     // boxPosition.value = {
     //     x: box.left,
@@ -36,8 +48,7 @@ if(detailPosition.value){
     //     width: boxText.right - boxText.left,
     //     height: boxText.bot - boxText.top
     // };
-
-}
+}, {immediate: true});
 
 function startDrag(e: MouseEvent){
     if(!boxPosition.value) return;
@@ -87,7 +98,7 @@ function stopDrag() {
 <div  class="dialog select-none" v-if="boxPosition && detailPosition" :style="{
         top: boxPosition.y + 'px',
         left: boxPosition.x + 'px',
-        fontSize: detailPosition.wordSize + 'px',
+        fontSize: wordSize + 'px',
         cursor: isDrag ? 'grabbing' : 'grab',
         border: previewStatus ? 'solid red 1px' : 'none',
         // boxSizing: 'border-box'
