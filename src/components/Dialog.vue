@@ -27,8 +27,8 @@ watch([detailPosition, scalePosition], ([dp, sc]) => {
 
     const boxText: Box = dp.boxText;
     const box: Box = dp.box;
-    console.log("text draw " + dp.text);
-    console.log("fnt size scale ", dp.wordSize);
+    // console.log("text draw " + dp.text);
+    // console.log("fnt size scale ", dp.wordSize);
 
     let left = boxText.left * sc.scaleX;
     let right = boxText.right * sc.scaleX;

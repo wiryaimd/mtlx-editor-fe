@@ -18,7 +18,8 @@ const isDrag: Ref<boolean> = ref<boolean>(false);
 
 const emit = defineEmits(['boxMove', 'boxClick'])
 
-// let cleanWidth = 0;
+let cleanWidth = 0;
+let left = 0, right = 0, top = 0, bot = 0;
 
 let boxIndex: number = props.index;
 let start = { x: 0, y: 0 };
@@ -31,13 +32,14 @@ watch([detailPosition, scalePosition], ([dp, sc]) => { // this called twice, bec
 
     const box: Box = dp.box;
     
-    let left = box.left * sc.scaleX;
-    let right = box.right * sc.scaleX;
-    let top = box.top * sc.scaleY;
-    let bot = box.bot * sc.scaleY;
+    left = box.left * sc.scaleX;
+    right = box.right * sc.scaleX;
+    top = box.top * sc.scaleY;
+    bot = box.bot * sc.scaleY;
     
     console.log(boxIndex, " lr ", left, right);
-    let cleanWidth = Math.floor((right - left) * 0.12); // default 0.08
+    cleanWidth = Math.floor((right - left) * 0.12); // default 0.08
+    console.log("cw", cleanWidth);
 
     boxWidth = (right - left + (cleanWidth * 2));
     boxHeight = (bot - top + (cleanWidth * 2));
@@ -90,9 +92,18 @@ function onDrag(e: MouseEvent) {
 }
 
 function stopDrag() {
+    if(!boxPosition.value) return;
+
+    let rawPosition: BoxPosition = { // remove back cleanWidth position
+        x: boxPosition.value.x + cleanWidth,
+        y: boxPosition.value.y + cleanWidth,
+        width: right - left,
+        height: bot - top
+    }
+    
     emit('boxMove', { // keep positionList in original raw position, for final export
         index: boxIndex,
-        boxPosition: boxPosition.value
+        boxPosition: rawPosition
     });
 
     isDrag.value = false

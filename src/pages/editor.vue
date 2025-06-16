@@ -36,9 +36,12 @@ if(uploadStore.files){
 
 watch(indexPage, (val: number) => {
     if(val < 0 || val >= imgList.length) return;
+
+    console.log("page", val);
     
     if(positionList.value){
         // currentPosition.value = positionList.value[val];
+        scale.value = undefined;
         imgTl.value = imgList[val];
         indexText.value = -1;
         indexBox.value = -1;
@@ -67,6 +70,8 @@ function onLoad(){
 
 function onBoxMove(box: SelectedBox){
     if(!scale.value) return
+    
+    console.log("box move call");
 
     // nb, need to calcualte back to default scale
     showBoxPosition.value = {
