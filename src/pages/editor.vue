@@ -5,6 +5,7 @@ import type { Position, Detail, Box } from '~/types/Position';
 import type { Scale } from '~/types/Scale';
 import type { SelectedBox } from '~/types/SelectedBox';
 
+const config = useRuntimeConfig();
 const uploadStore = useUploadStore();
 
 const imgTl = ref("");
@@ -104,6 +105,41 @@ function onTextClick(index: number){
     indexText.value = index;
 }
 
+async function saveClick(e: Event){
+    try{
+        const response: Response = await $fetch(config.public.api.base + "/translate/save", {
+            method: 'POST',
+            body: JSON.stringify({
+                uid: uploadStore.uid,
+                sourceLang: uploadStore.sourceLang,
+                targetLang: uploadStore.targetLang,
+                positions: positionList.value,
+            }),
+            headers: {
+                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc1MDA3ODk0NSwiaWF0IjoxNzUwMDY4MTQ1fQ.ZvHgWj-6l5AULVlTb9QkmCS6yH7KuY1jFj4KHHcihf4',
+                'Content-Type': 'application/json'
+            }
+        });
+    
+        if (!response) {
+            console.error('Download failed');
+            return;
+        }
+    
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+    
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'tlx' + crypto.randomUUID().substring(0, 8) + '.zip';
+        link.click();
+    
+        window.URL.revokeObjectURL(url);
+    }catch(err){
+        // msgProcess.value = "Save failed";
+    }
+}
+
 
 onMounted(() => {
 
@@ -158,30 +194,35 @@ onMounted(() => {
                 </div>
 
                 <div>
-                    <div>
-                        Page {{ indexPage + 1 }}
-                    </div>
-                    <div class="mt-5">
-                        <button @click="indexPage--" :disabled="indexPage <= 0" class="px-4 py-2 bg-white rounded border hover:bg-red-100 active:bg-red-200">Prev</button>
-                        <button @click="indexPage++" :disabled="indexPage >= imgList.length - 1" class="mx-5 px-4 py-2 bg-white rounded border hover:bg-red-100 active:bg-red-200">Next</button>
+                    <div class="mt-5 flex">
+                        <button @click="indexPage--" :disabled="indexPage <= 0" class="w-full mr-2 px-4 py-2 bg-white rounded border hover:bg-red-100 active:bg-red-200">Prev</button>
+                        <button @click="indexPage++" :disabled="indexPage >= imgList.length - 1" class="w-full ml-2 px-4 py-2 bg-white rounded border hover:bg-red-100 active:bg-red-200">Next</button>
                     </div>
 
-                    <div>
-                        <input type="checkbox" checked="true" v-model="previewStatus">Border {{ previewStatus }}</input>
+                    <div class="mt-2">
+                        Page: {{ indexPage + 1 }}
                     </div>
 
-                    <div v-if="indexBox !== -1">
-                        <p>Index {{ indexBox }}</p>
+                    <div class="mt-2">
+                        <input class="m-2" type="checkbox" checked="true" v-model="previewStatus">Border preview: {{ previewStatus }}</input>
+                    </div>
+
+                    <div class="mt-5" v-if="indexBox">
+                        <p>Index Box: {{ indexBox }}</p>
                     </div>
         
-                    <div v-if="indexText !== -1">
-                        <p>Index text {{ indexText }}</p>
+                    <div v-if="indexText">
+                        <p>Index Text: {{ indexText }}</p>
                     </div>
                 </div>
 
-                <div v-if="showBoxPosition" class="">
-                    <p>{{ showBoxPosition.left.toFixed() }}</p>
-                    <p>{{ showBoxPosition.top.toFixed() }}</p>
+                <div v-if="showBoxPosition" class="mt-5">
+                    <p>Box x: {{ showBoxPosition.left.toFixed() }}</p>
+                    <p>Box y: {{ showBoxPosition.top.toFixed() }}</p>
+                </div>
+
+                <div>
+                    <button @click="saveClick" class="w-full mt-5 mr-2 px-4 py-2 bg-red-100 rounded border hover:bg-red-200 active:bg-red-300">Save & Export All</button>
                 </div>
 
             </div>

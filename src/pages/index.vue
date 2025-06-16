@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Lang } from '~/types/Lang';
 import type { Position } from '~/types/Position';
+import type { Translation } from '~/types/Translation';
 
 const config = useRuntimeConfig();
 const router = useRouter();
@@ -42,17 +43,20 @@ async function translateClick(){
     }
 
     try{
-        let res: Position[] | void = await $fetch<Position[]>(config.public.api.base + "/translate/upload", {
+        let res: Translation | void = await $fetch<Translation>(config.public.api.base + "/translate/upload", {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc1MDA2Nzc4OCwiaWF0IjoxNzUwMDU2OTg4fQ.TCs6rgwq82U2Lrji7LYeJBtzbxAbBFfmI9RHav0bmqs'
+                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc1MDA3ODk0NSwiaWF0IjoxNzUwMDY4MTQ1fQ.ZvHgWj-6l5AULVlTb9QkmCS6yH7KuY1jFj4KHHcihf4'
             },
             body: formData
         });
 
         if(res){
             console.log("res", res);
-            uploadStore.setPosition(res);
+            uploadStore.setUid(res.uid);
+            uploadStore.setSrc(res.sourceLang);
+            uploadStore.setTarget(res.targetLang);
+            uploadStore.setPosition(res.positions);
             uploadStore.setFiles(files.value);
         
             msgProcess.value = "";
@@ -85,7 +89,7 @@ async function translateClick(){
     </div>
 
     <div class="flex flex-col items-center mt-16">
-        <label class="p-3 rounded-sm border-2 border-dotted w-150 text-center" for="select">
+        <label class="px-3 py-16 rounded-sm border-2 border-dotted w-150 text-center" for="select">
             <!-- style="display: none;" -->
             <input class="sr-only" id="select" type="file" accept="image/jpg|image/jpg" multiple @change="selectedFile">
             <!-- <label class="bg-blue-200 rounded-sm border-2 border-dotted" for="select">Select</label> -->

@@ -2,7 +2,7 @@
     <header class="bg-red-50">
         <ul class="flex">
             <li class="p-2">
-                <a class="underline" href="/">Home</a>
+                <a class="underline" href="/">Mangatlx</a>
             </li>
             <li class="p-2">
                 <a class="underline" href="/editor">Editor</a>

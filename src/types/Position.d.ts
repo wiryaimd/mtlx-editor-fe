@@ -15,6 +15,7 @@ export interface Detail{
 
 export interface Position{
     text: string,
+    fileName: string,
     width: number,
     height: number,
     details: Detail[]
