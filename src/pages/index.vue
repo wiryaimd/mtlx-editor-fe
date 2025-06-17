@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Lang } from '~/types/Lang';
 import type { Position } from '~/types/Position';
+import type { Token } from '~/types/Token';
 import type { Translation } from '~/types/Translation';
 
 const config = useRuntimeConfig();
@@ -12,13 +13,15 @@ const msgProcess: Ref<string> = ref("");
 
 const uploadStore = useUploadStore();
 
-
 const targetLang: Lang[] = LANG;
 const sourceLang: Lang[] = LANG_SRC;
 // const targetLangId: string[] = LANG_TO_ID;
 
 const selectedLangSource: Ref<string> = ref("none");
 const selectedLang: Ref<string> = ref("none");
+const turnstile: Ref<string | undefined> = ref();
+
+const token = useState<string>("token");
 
 function selectedFile(e: Event){
     const input: HTMLInputElement = e.target as HTMLInputElement;
@@ -30,6 +33,11 @@ function selectedFile(e: Event){
 }
 
 async function translateClick(){
+    if(!token.value){
+        msgProcess.value = "User not validated...";
+        return;
+    }
+
     msgProcess.value = "Uploading...";
 
     let f: File[] = files.value;
@@ -46,7 +54,7 @@ async function translateClick(){
         let res: Translation | void = await $fetch<Translation>(config.public.api.base + "/translate/upload", {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc1MDA3ODk0NSwiaWF0IjoxNzUwMDY4MTQ1fQ.ZvHgWj-6l5AULVlTb9QkmCS6yH7KuY1jFj4KHHcihf4'
+                'Authorization': 'Bearer ' + token.value
             },
             body: formData
         });
@@ -71,11 +79,21 @@ async function translateClick(){
     }
 }
 
-// onMounted(async () => {
-//     const res: AxiosResponse<string> = await http.get<string>("/users/test");
+watch(turnstile, async (token) => {
+    console.log("fr anjeg", token);
 
-//     console.log(res.data + " hooh");
-// });
+    msgProcess.value = "";
+
+    const response: Token | undefined = await $fetch(config.public.api.base + '/auth/sign', {
+        method: 'POST',
+        body: { token: token },
+    });
+
+    if(response){
+        console.log("jwt token", token);
+        useState('token').value = response.token;
+    }
+});
 
 </script>
 
@@ -110,11 +128,14 @@ async function translateClick(){
                     <option v-for="t in targetLang" :value="t.id" :key="t.id">{{ t.lang }}</option>
                 </select>
             </div>
-            <div class="mt-5 ml-5 mb-5 border bg-red-50 px-5 rounded p-1">
-                <button @click="translateClick">Translate</button>
+            <div>
+                <button @click="translateClick" class="mt-5 ml-5 mb-5 border bg-red-100 px-5 rounded p-1 hover:bg-red-200 active:bg-red-300">Translate</button>
             </div>
         </div>
-        
+
+        <div>
+            <NuxtTurnstile data-theme="light" v-model="turnstile"></NuxtTurnstile>
+        </div>
 
         <div class="flex w-100">
             <ul class="w-full">

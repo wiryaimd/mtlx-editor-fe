@@ -3,7 +3,9 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
   srcDir: 'src/',
-
+  turnstile: {
+    siteKey: '0x4AAAAAABhVVB-8WU1AaiHT'
+  },
   runtimeConfig: {
     public: {
       api: {
@@ -12,5 +14,9 @@ export default defineNuxtConfig({
     }
   },
   css: ['@/assets/css/fonts.css'],
-  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss"]
+  modules: [
+    "@pinia/nuxt",
+    "@nuxtjs/tailwindcss",
+    "@nuxtjs/turnstile"
+  ]
 })

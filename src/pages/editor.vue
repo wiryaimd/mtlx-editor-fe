@@ -23,6 +23,7 @@ const indexText = ref<number>(-1);
 const indexPage = ref<number>(0);
 
 const tlRef = ref<HTMLImageElement | null>(null);
+const token = useState<string>("token");
 
 const positionList: Ref<Position[] | undefined> = ref(uploadStore.position);
 // const currentPosition: Ref<Position | undefined> = ref();
@@ -106,8 +107,13 @@ function onTextClick(index: number){
 }
 
 async function saveClick(e: Event){
+    if(!token.value){
+        console.log("Token not found");
+        return;
+    }
+
     try{
-        const response: Response = await $fetch(config.public.api.base + "/translate/save", {
+        const response: Response = await fetch(config.public.api.base + "/translate/save", {
             method: 'POST',
             body: JSON.stringify({
                 uid: uploadStore.uid,
@@ -116,7 +122,7 @@ async function saveClick(e: Event){
                 positions: positionList.value,
             }),
             headers: {
-                'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJob29oMiIsImV4cCI6MTc1MDA3ODk0NSwiaWF0IjoxNzUwMDY4MTQ1fQ.ZvHgWj-6l5AULVlTb9QkmCS6yH7KuY1jFj4KHHcihf4',
+                'Authorization': 'Bearer ' + token.value,
                 'Content-Type': 'application/json'
             }
         });
@@ -136,6 +142,7 @@ async function saveClick(e: Event){
     
         window.URL.revokeObjectURL(url);
     }catch(err){
+        console.log(err);
         // msgProcess.value = "Save failed";
     }
 }
