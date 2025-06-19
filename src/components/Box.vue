@@ -26,6 +26,7 @@ let start = { x: 0, y: 0 };
 
 // bug, width and height increasing when page move, this ahappen when emit to parent, and reapply the position
 let boxWidth = 0, boxHeight = 0;
+let roundScale = 24;
 
 watch([detailPosition, scalePosition], ([dp, sc]) => { // this called twice, because emit()?
     if(!dp || !sc) return;
@@ -36,10 +37,11 @@ watch([detailPosition, scalePosition], ([dp, sc]) => { // this called twice, bec
     right = box.right * sc.scaleX;
     top = box.top * sc.scaleY;
     bot = box.bot * sc.scaleY;
+    roundScale = 24 * sc.scaleY;
     
-    console.log(boxIndex, " lr ", left, right);
+    // console.log(boxIndex, " lr ", left, right);
     cleanWidth = Math.floor((right - left) * 0.12); // default 0.08
-    console.log("cw", cleanWidth);
+    // console.log("cw", cleanWidth);
 
     boxWidth = (right - left + (cleanWidth * 2));
     boxHeight = (bot - top + (cleanWidth * 2));
@@ -121,7 +123,8 @@ function stopDrag() {
         width: boxPosition.width + 'px',
         height: boxPosition.height + 'px',
         cursor: isDrag ? 'grabbing' : 'grab',
-        border: previewStatus ? 'solid blue 1px' : 'none'
+        border: previewStatus ? 'solid blue 1px' : 'none',
+        borderRadius: roundScale + 'px'
     }" @mousedown="startDrag">
 
     </div>
@@ -133,7 +136,7 @@ function stopDrag() {
 .box{
     position: absolute;
     background-color: white;
-    border-radius: 24px;
+    /* border-radius: 24px; */
 }
 
 </style>

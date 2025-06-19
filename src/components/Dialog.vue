@@ -13,6 +13,8 @@ const previewStatus: Ref<boolean | undefined> = defineModel<boolean>('preview_st
 const boxPosition: Ref<BoxPosition | undefined> = ref<BoxPosition>();
 const wordSize: Ref<number> = ref<number>(0);
 
+const dialogRef: Ref<HTMLElement | null> = ref<HTMLElement | null>(null);
+
 const isDrag: Ref<boolean> = ref<boolean>(false);
 const textIndex = props.index;
 
@@ -54,6 +56,27 @@ watch([detailPosition, scalePosition], ([dp, sc]) => {
     //     height: boxText.bot - boxText.top
     // };
 }, {immediate: true});
+
+watch(() => detailPosition.value?.text ?? '', async () => {
+    await nextTick();
+    if(dialogRef.value && boxPosition.value){
+        const { offsetWidth, offsetHeight } = dialogRef.value;
+
+        width = offsetWidth,
+        height = offsetHeight
+
+        boxPosition.value = {
+            ...boxPosition.value,
+            width: width,
+            height: height
+        };
+
+        emit('textMove', {
+            index: textIndex,
+            boxPosition: boxPosition.value
+        });
+    }
+});
 
 function startDrag(e: MouseEvent){
     if(!boxPosition.value) return;
@@ -103,7 +126,7 @@ function stopDrag() {
 
 <template>
 
-<div  class="dialog select-none" v-if="boxPosition && detailPosition" :style="{
+<div ref="dialogRef" class="dialog select-none" v-if="boxPosition && detailPosition" :style="{
         top: boxPosition.y + 'px',
         left: boxPosition.x + 'px',
         fontSize: wordSize + 'px',
