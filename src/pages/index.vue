@@ -33,6 +33,16 @@ function selectedFile(e: Event){
 }
 
 async function translateClick(){
+    if(!files.value || files.value.length === 0){
+        msgProcess.value = "Please select image file...";
+        return;
+    }
+
+    if(files.value.length > 15){
+        msgProcess.value = "Cannot more than 15 image at same time...";
+        return;
+    }
+
     if(!token.value){
         msgProcess.value = "User not validated...";
         return;
@@ -50,33 +60,71 @@ async function translateClick(){
         formData.append("imgs", f[i]);
     }
 
-    try{
-        let res: Translation | void = await $fetch<Translation>(config.public.api.base + "/translate/upload", {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + token.value
-            },
-            body: formData
-        });
+    const xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+            let progress = Math.round((e.loaded / e.total) * 100);
+            msgProcess.value = "Uploading... " + progress + "%";
+            if (progress === 100) {
+                msgProcess.value = "Processing...";
+            }
+        }
+    };
 
-        if(res){
-            console.log("res", res);
+    xhr.onload = () => {
+        if (xhr.status === 200) {
+            msgProcess.value = "";
+
+            let res: Translation = JSON.parse(xhr.responseText);
+
             uploadStore.setUid(res.uid);
             uploadStore.setSrc(res.sourceLang);
             uploadStore.setTarget(res.targetLang);
             uploadStore.setPosition(res.positions);
             uploadStore.setFiles(files.value);
-        
-            msgProcess.value = "";
-            router.push("/editor");
-        }else{
-            msgProcess.value = "Result not found";
-        }
 
-    }catch(err){
-        console.log("req failed", err);
-        msgProcess.value = "Upload failed";
+            router.push("/editor");
+
+        } else {
+            msgProcess.value = "Failed to process";
+        }
     }
+
+    xhr.onerror = () => {
+        msgProcess.value = "Something went wrong...";
+    }
+
+    xhr.open("POST", config.public.api.base + "/translate/upload");
+    xhr.setRequestHeader("Authorization", "Bearer " + token.value);
+    xhr.send(formData);
+
+    // try{
+    //     let res: Translation | void = await $fetch<Translation>(config.public.api.base + "/translate/upload", {
+    //         method: 'POST',
+    //         headers: {
+    //             'Authorization': 'Bearer ' + token.value
+    //         },
+    //         body: formData
+    //     });
+
+    //     if(res){
+    //         console.log("res", res);
+    //         uploadStore.setUid(res.uid);
+    //         uploadStore.setSrc(res.sourceLang);
+    //         uploadStore.setTarget(res.targetLang);
+    //         uploadStore.setPosition(res.positions);
+    //         uploadStore.setFiles(files.value);
+        
+    //         msgProcess.value = "";
+    //         router.push("/editor");
+    //     }else{
+    //         msgProcess.value = "Result not found";
+    //     }
+
+    // }catch(err){
+    //     console.log("req failed", err);
+    //     msgProcess.value = "Upload failed";
+    // }
 }
 
 watch(turnstile, async (token) => {
@@ -98,59 +146,62 @@ watch(turnstile, async (token) => {
 </script>
 
 <template>
-    <div>
+    <div class="flex flex-col min-h-screen">
         <Header></Header>
-    </div>
 
-    <div>
+    <!-- <div>
         <p>{{selectedLangSource}} {{selectedLang}}</p>
-    </div>
+    </div> -->
 
-    <div class="flex flex-col items-center mt-16">
-        <label class="px-3 py-16 rounded-sm border-2 border-dotted w-150 text-center" for="select">
-            <!-- style="display: none;" -->
-            <input class="sr-only" id="select" type="file" accept="image/jpg|image/jpg" multiple @change="selectedFile">
-            <!-- <label class="bg-blue-200 rounded-sm border-2 border-dotted" for="select">Select</label> -->
-             Select
-        </label>
+        <div class="flex flex-col items-center mt-16 ">
+            <label class="px-3 py-16 rounded-sm border-2 border-dotted border-gray-400 w-150 text-center cursor-pointer" for="select">
+                <!-- style="display: none;" -->
+                <input class="sr-only" id="select" type="file" accept="image/jpg|image/jpg" multiple @change="selectedFile">
+                <!-- <label class="bg-blue-200 rounded-sm border-2 border-dotted" for="select">Select</label> -->
+                Select Image
+            </label>
 
-        <div class="flex w-150">
-            <div class="w-full border mb-5 mt-5 p-1 rounded">
-                <select class="w-full" v-model="selectedLangSource">
-                    <option value="none" selected>&lt;Letter type&gt;</option>
-                    <option v-for="t in sourceLang" :value="t.id" :key="t.id">{{ t.lang }}</option>
-                </select>
+            <div class="flex w-150">
+                <div class="w-full border border-gray-400 mb-5 mt-5 p-1 rounded">
+                    <select class="w-full" v-model="selectedLangSource">
+                        <option value="none" selected>&lt;Letter type&gt;</option>
+                        <option v-for="t in sourceLang" :value="t.id" :key="t.id">{{ t.lang }}</option>
+                    </select>
+                </div>
+
+                <div class="ml-5 border border-gray-400 w-full mb-5 mt-5 p-1 rounded">
+                    <select class="w-full" v-model="selectedLang">
+                        <option value="none" selected>&lt;Target&gt;</option>
+                        <option v-for="t in targetLang" :value="t.id" :key="t.id">{{ t.lang }}</option>
+                    </select>
+                </div>
+                <div>
+                    <button @click="translateClick" class="mt-5 ml-5 mb-5 border border-gray-400 bg-red-100 px-5 rounded p-1 hover:bg-red-200 active:bg-red-300 cursor-pointer">Translate</button>
+                </div>
             </div>
 
-            <div class="ml-5 border w-full mb-5 mt-5 p-1 rounded">
-                <select class="w-full" v-model="selectedLang">
-                    <option value="none" selected>&lt;Target&gt;</option>
-                    <option v-for="t in targetLang" :value="t.id" :key="t.id">{{ t.lang }}</option>
-                </select>
-            </div>
             <div>
-                <button @click="translateClick" class="mt-5 ml-5 mb-5 border bg-red-100 px-5 rounded p-1 hover:bg-red-200 active:bg-red-300">Translate</button>
+                <NuxtTurnstile data-theme="light" v-model="turnstile"></NuxtTurnstile>
+            </div>
+
+            <div class="flex w-100">
+                <ul class="w-full">
+                    <!-- <li v-for="index in Math.max(15, files.length)">
+                        {{ files[index].name }}
+                    </li> -->
+
+                    <li class="w-full text-center" v-for="f in showFile"> {{f}} </li>
+
+                    <p v-if="files.length > 15">.... {{files.length}} files</p>
+                </ul>
+            </div>
+
+            <div>
+                <p>{{ msgProcess }}</p>
             </div>
         </div>
 
-        <div>
-            <NuxtTurnstile data-theme="light" v-model="turnstile"></NuxtTurnstile>
-        </div>
+        <Footer class="mt-auto"></Footer>
 
-        <div class="flex w-100">
-            <ul class="w-full">
-                <!-- <li v-for="index in Math.max(15, files.length)">
-                    {{ files[index].name }}
-                </li> -->
-
-                <li class="w-full text-center" v-for="f in showFile"> {{f}} </li>
-
-                <p v-if="files.length > 15">.... {{files.length}} files</p>
-            </ul>
-        </div>
-
-        <div>
-            <p>{{ msgProcess }}</p>
-        </div>
     </div>
 </template>

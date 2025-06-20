@@ -29,6 +29,10 @@ const positionList: Ref<Position[] | undefined> = ref(uploadStore.position);
 // const currentPosition: Ref<Position | undefined> = ref();
 const scale: Ref<Scale | undefined> = ref();
 
+if(!positionList.value || !token.value){
+    navigateTo("/");
+}
+
 const imgList: string[] = [];
 if(uploadStore.files){
     for(let i = 0; i < uploadStore.files.length; i++){
@@ -163,7 +167,7 @@ onMounted(() => {
         <div class="flex flex-1 overflow-hidden justify-center">
 
             <div class="relative overflow-hidden mt-15 mb-15 inline-block">
-                <img class="border h-full" @load="onLoad" ref="tlRef" :src="imgTl" alt="tl" height="100vh" draggable="false">
+                <img class="border h-full border-gray-400" @load="onLoad" ref="tlRef" :src="imgTl" alt="tl" height="100vh" draggable="false">
                 <div v-if="positionList && scale">
                     <Box 
                         @box-move="onBoxMove"
@@ -193,17 +197,17 @@ onMounted(() => {
 
             <div class="m-15">
                 <div v-if="positionList && indexText !== -1">
-                    <textarea class="bg-white p-2 w-full border rounded" v-model="positionList[indexPage].details[indexText].text" rows="10" cols="50"></textarea>
+                    <textarea class="bg-white p-2 w-full border border-gray-400 rounded" v-model="positionList[indexPage].details[indexText].text" rows="10" cols="50"></textarea>
                 </div>
     
                 <div v-else>
-                    <textarea class="bg-white p-2 w-full border rounded" rows="10" cols="50"></textarea>
+                    <textarea class="bg-white p-2 w-full border border-gray-400 rounded" rows="10" cols="50"></textarea>
                 </div>
 
                 <div>
                     <div class="mt-5 flex">
-                        <button @click="indexPage--" :disabled="indexPage <= 0" class="w-full mr-2 px-4 py-2 bg-white rounded border hover:bg-red-100 active:bg-red-200">Prev</button>
-                        <button @click="indexPage++" :disabled="indexPage >= imgList.length - 1" class="w-full ml-2 px-4 py-2 bg-white rounded border hover:bg-red-100 active:bg-red-200">Next</button>
+                        <button @click="indexPage--" :disabled="indexPage <= 0" class="w-full mr-2 px-4 py-2 bg-white rounded border border-gray-400 hover:bg-red-100 active:bg-red-200">Prev</button>
+                        <button @click="indexPage++" :disabled="indexPage >= imgList.length - 1" class="w-full ml-2 px-4 py-2 bg-white rounded border border-gray-400 hover:bg-red-100 active:bg-red-200">Next</button>
                     </div>
 
                     <div class="mt-2">
@@ -229,7 +233,7 @@ onMounted(() => {
                 </div>
 
                 <div>
-                    <button @click="saveClick" class="w-full mt-5 mr-2 px-4 py-2 bg-red-100 rounded border hover:bg-red-200 active:bg-red-300">Save & Export All</button>
+                    <button @click="saveClick" class="w-full mt-5 mr-2 px-4 py-2 bg-red-100 rounded border border-gray-400 hover:bg-red-200 active:bg-red-300">Save & Export All</button>
                 </div>
 
             </div>
