@@ -4,6 +4,18 @@ import type { Position } from '~/types/Position';
 import type { Token } from '~/types/Token';
 import type { Translation } from '~/types/Translation';
 
+useSeoMeta({
+    title: 'Mangatlx – Automatic comic translantion and editor',
+    description: 'Automatic comic, manga, manhwa, manhua translantion and editor',
+    ogTitle: 'Manga Translator',
+    ogDescription: 'Automatic comic, manga, manhwa, manhua translantion and editor',
+    ogImage: 'https://mangatlx.com/og-image.png'
+});
+
+useHead({
+  link: [{ rel: 'canonical', href: 'https://mangatlx.com' }]
+})
+
 const config = useRuntimeConfig();
 const router = useRouter();
 

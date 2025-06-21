@@ -1,8 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
+  ssr: true,
   devtools: { enabled: true },
   srcDir: 'src/',
+  robots: {
+    allow: '/'
+  },
   turnstile: {
     siteKey: '0x4AAAAAABhVVB-8WU1AaiHT'
   },
@@ -17,6 +21,7 @@ export default defineNuxtConfig({
   modules: [
     "@pinia/nuxt",
     "@nuxtjs/tailwindcss",
-    "@nuxtjs/turnstile"
+    "@nuxtjs/turnstile",
+    "@nuxtjs/robots"
   ]
 })
