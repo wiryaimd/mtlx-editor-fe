@@ -24,11 +24,10 @@ let left = 0, right = 0, top = 0, bot = 0;
 let boxIndex: number = props.index;
 let start = { x: 0, y: 0 };
 
-// bug, width and height increasing when page move, this ahappen when emit to parent, and reapply the position
 let boxWidth = 0, boxHeight = 0;
 let roundScale = 24;
 
-watch([detailPosition, scalePosition], ([dp, sc]) => { // this called twice, because emit()?
+watch([detailPosition, scalePosition], ([dp, sc]) => {
     if(!dp || !sc) return;
 
     const box: Box = dp.box;

@@ -90,7 +90,8 @@ async function translateClick(){
         }
     }
 
-    xhr.onerror = () => {
+    xhr.onerror = (e) => {
+        console.log(e);
         msgProcess.value = "Something went wrong...";
     }
 
@@ -128,8 +129,6 @@ async function translateClick(){
 }
 
 watch(turnstile, async (token) => {
-    console.log("fr anjeg", token);
-
     msgProcess.value = "";
 
     const response: Token | undefined = await $fetch(config.public.api.base + '/auth/sign', {
@@ -138,7 +137,6 @@ watch(turnstile, async (token) => {
     });
 
     if(response){
-        console.log("jwt token", token);
         useState('token').value = response.token;
     }
 });
