@@ -5,7 +5,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   srcDir: 'src/',
   robots: {
-    allow: '/'
+    allow: '/',
+    disallow: ''
   },
   turnstile: {
     siteKey: '0x4AAAAAABhVVB-8WU1AaiHT'

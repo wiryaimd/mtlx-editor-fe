@@ -62,25 +62,53 @@ watch([detailPosition, scalePosition], ([dp, sc]) => {
 //     console.log(val);
 // });
 
-function startDrag(e: MouseEvent){
+function startDrag(e: MouseEvent | TouchEvent){
     if(!boxPosition.value) return;
 
     emit('boxClick', boxIndex);
     
     isDrag.value = true
 
-    start.x = e.clientX - boxPosition.value.x
-    start.y = e.clientY - boxPosition.value.y
+    let clientX: number;
+    let clientY: number;
 
-    window.addEventListener('mousemove', onDrag)
-    window.addEventListener('mouseup', stopDrag)
+    if (e instanceof TouchEvent) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+        e.preventDefault(); // Prevent scroll while dragging
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+
+    start.x = clientX - boxPosition.value.x
+    start.y = clientY - boxPosition.value.y
+
+    window.addEventListener('mousemove', onDrag);
+    window.addEventListener('mouseup', stopDrag);
+    
+    window.addEventListener('touchmove', onDrag, { passive: false });
+    window.addEventListener('touchend', stopDrag);
 }
 
-function onDrag(e: MouseEvent) {
+function onDrag(e: MouseEvent | TouchEvent) {
     if(!isDrag.value) return
     if(!boxPosition.value) return;
-    let newLeft = e.clientX - start.x;
-    let newTop = e.clientY - start.y;
+
+    let clientX: number;
+    let clientY: number;
+
+    if (e instanceof TouchEvent) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+        e.preventDefault(); // Prevent scroll while dragging
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+
+    let newLeft = clientX - start.x;
+    let newTop = clientY - start.y;
 
     boxPosition.value = {
         // x: newLeft - cleanWidth,
@@ -110,6 +138,8 @@ function stopDrag() {
     isDrag.value = false
     window.removeEventListener('mousemove', onDrag)
     window.removeEventListener('mouseup', stopDrag)
+    window.removeEventListener('touchmove', onDrag);
+    window.removeEventListener('touchend', stopDrag);
 }
 
 </script>
@@ -124,7 +154,9 @@ function stopDrag() {
         cursor: isDrag ? 'grabbing' : 'grab',
         border: previewStatus ? 'solid blue 1px' : 'none',
         borderRadius: roundScale + 'px'
-    }" @mousedown="startDrag">
+    }" 
+    @mousedown="startDrag" 
+    @touchstart="startDrag">
 
     </div>
 

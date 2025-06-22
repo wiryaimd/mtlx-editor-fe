@@ -159,15 +159,15 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="flex flex-col h-screen">
+    <div class="flex flex-col min-h-screen">
         <div>
             <Header></Header>
         </div>
         
-        <div class="flex flex-1 overflow-hidden justify-center">
+        <div class="flex flex-1 flex-col lg:flex-row lg:overflow-hidden justify-center p-4">
 
-            <div class="relative overflow-hidden mt-15 mb-15 inline-block">
-                <img class="border h-full border-gray-400" @load="onLoad" ref="tlRef" :src="imgTl" alt="tl" height="100vh" draggable="false">
+            <div class="relative overflow-hidden mt-15 mb-15 inline-block w-full lg:w-auto">
+                <img class="border max-h-[70vh] object-contain border-gray-400 " @load="onLoad" ref="tlRef" :src="imgTl" alt="tl" height="100vh" draggable="false">
                 <div v-if="positionList && scale">
                     <Box 
                         @box-move="onBoxMove"
@@ -195,7 +195,7 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div class="m-15">
+            <div class="lg:m-15">
                 <div v-if="positionList && indexText !== -1">
                     <textarea class="bg-white p-2 w-full border border-gray-400 rounded" v-model="positionList[indexPage].details[indexText].text" rows="10" cols="50"></textarea>
                 </div>
@@ -233,11 +233,13 @@ onMounted(() => {
                 </div>
 
                 <div>
-                    <button @click="saveClick" class="w-full mt-5 mr-2 px-4 py-2 bg-red-100 rounded border border-gray-400 hover:bg-red-200 active:bg-red-300">Save & Export All</button>
+                    <button @click="saveClick" class="w-full mt-5 mb-5 mr-2 px-4 py-2 bg-red-100 rounded border border-gray-400 hover:bg-red-200 active:bg-red-300">Save & Export All</button>
                 </div>
 
             </div>
         </div>
+
+        <Footer class="mt-auto"></Footer>
 
     </div>
 </template>

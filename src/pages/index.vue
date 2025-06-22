@@ -110,34 +110,6 @@ async function translateClick(){
     xhr.open("POST", config.public.api.base + "/translate/upload");
     xhr.setRequestHeader("Authorization", "Bearer " + token.value);
     xhr.send(formData);
-
-    // try{
-    //     let res: Translation | void = await $fetch<Translation>(config.public.api.base + "/translate/upload", {
-    //         method: 'POST',
-    //         headers: {
-    //             'Authorization': 'Bearer ' + token.value
-    //         },
-    //         body: formData
-    //     });
-
-    //     if(res){
-    //         console.log("res", res);
-    //         uploadStore.setUid(res.uid);
-    //         uploadStore.setSrc(res.sourceLang);
-    //         uploadStore.setTarget(res.targetLang);
-    //         uploadStore.setPosition(res.positions);
-    //         uploadStore.setFiles(files.value);
-        
-    //         msgProcess.value = "";
-    //         router.push("/editor");
-    //     }else{
-    //         msgProcess.value = "Result not found";
-    //     }
-
-    // }catch(err){
-    //     console.log("req failed", err);
-    //     msgProcess.value = "Upload failed";
-    // }
 }
 
 watch(turnstile, async (token) => {
@@ -159,34 +131,28 @@ watch(turnstile, async (token) => {
     <div class="flex flex-col min-h-screen">
         <Header></Header>
 
-    <!-- <div>
-        <p>{{selectedLangSource}} {{selectedLang}}</p>
-    </div> -->
-
-        <div class="flex flex-col items-center mt-16 ">
-            <label class="px-3 py-16 rounded-sm border-2 border-dotted border-gray-400 w-150 text-center cursor-pointer" for="select">
-                <!-- style="display: none;" -->
+        <div class="flex flex-col items-center mt-8 px-2 sm:mt-16">
+            <label class="px-3 py-12 sm:py-16 rounded-sm border-2 border-dotted border-gray-400 w-full sm:w-150 text-center cursor-pointer" for="select">
                 <input class="sr-only" id="select" type="file" accept="image/jpg|image/jpg" multiple @change="selectedFile">
-                <!-- <label class="bg-blue-200 rounded-sm border-2 border-dotted" for="select">Select</label> -->
                 Select Image
             </label>
 
-            <div class="flex w-150">
-                <div class="w-full border border-gray-400 mb-5 mt-5 p-1 rounded">
+            <div class="flex flex-col sm:flex-row w-full max-w-2xl sm:w-150">
+                <div class="w-full border border-gray-400 mb-3 sm:mb-5 mt-3 sm:mt-5 p-1 rounded">
                     <select class="w-full" v-model="selectedLangSource">
                         <option value="none" selected>&lt;Letter type&gt;</option>
                         <option v-for="t in sourceLang" :value="t.id" :key="t.id">{{ t.lang }}</option>
                     </select>
                 </div>
 
-                <div class="ml-5 border border-gray-400 w-full mb-5 mt-5 p-1 rounded">
+                <div class="sm:ml-5 w-full border border-gray-400 mb-3 sm:mb-5 mt-3 sm:mt-5 p-1 rounded">
                     <select class="w-full" v-model="selectedLang">
                         <option value="none" selected>&lt;Target&gt;</option>
                         <option v-for="t in targetLang" :value="t.id" :key="t.id">{{ t.lang }}</option>
                     </select>
                 </div>
-                <div>
-                    <button @click="translateClick" class="mt-5 ml-5 mb-5 border border-gray-400 bg-red-100 px-5 rounded p-1 hover:bg-red-200 active:bg-red-300 cursor-pointer">Translate</button>
+                <div class="flex justify-center sm:block">
+                    <button @click="translateClick" class="mt-3 sm:mt-5 sm:ml-5 mb-3 sm:mb-5 border border-gray-400 bg-red-100 px-5 rounded p-1 hover:bg-red-200 active:bg-red-300 cursor-pointer w-full sm:w-auto">Translate</button>
                 </div>
             </div>
 
@@ -196,12 +162,7 @@ watch(turnstile, async (token) => {
 
             <div class="flex w-100">
                 <ul class="w-full">
-                    <!-- <li v-for="index in Math.max(15, files.length)">
-                        {{ files[index].name }}
-                    </li> -->
-
                     <li class="w-full text-center" v-for="f in showFile"> {{f}} </li>
-
                     <p v-if="files.length > 15">.... {{files.length}} files</p>
                 </ul>
             </div>
@@ -212,6 +173,5 @@ watch(turnstile, async (token) => {
         </div>
 
         <Footer class="mt-auto"></Footer>
-
     </div>
 </template>
