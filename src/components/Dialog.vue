@@ -103,6 +103,8 @@ function startDrag(e: MouseEvent | TouchEvent){
     window.addEventListener('mousemove', onDrag)
     window.addEventListener('mouseup', stopDrag)
 
+    window.addEventListener('touchmove', onDrag, { passive: false });
+    window.addEventListener('touchend', stopDrag);
 }
 
 function onDrag(e: MouseEvent | TouchEvent) {
