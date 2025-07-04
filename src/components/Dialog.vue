@@ -147,10 +147,6 @@ function stopDrag() {
     window.removeEventListener('touchend', stopDrag);
 }
 
-// function textClick(){
-//     emit('textClick', textIndex);
-// }
-
 </script>
 
 <template>

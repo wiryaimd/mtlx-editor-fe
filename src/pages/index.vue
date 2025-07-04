@@ -6,8 +6,8 @@ import type { Translation } from '~/types/Translation';
 
 useSeoMeta({
     title: 'Mangatlx – Automatic comic translantion and editor',
-    description: 'Automatic comic, manga, manhwa, manhua translantion and editor',
-    ogTitle: 'Manga Translator',
+    description: 'Translate automatically comic manga, manhwa, manhua translator and editor',
+    ogTitle: 'Manga Translator - Fast automatic translation',
     ogDescription: 'Automatic comic, manga, manhwa, manhua translantion and editor',
     ogImage: 'https://mangatlx.com/og-image.png'
 });
